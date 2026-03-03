@@ -1,0 +1,133 @@
+:root {
+    /*colores*/
+    --color-prioridad-alta: #e74c3c; 
+    --color-prioridad-media: #f39c12;
+    --color-prioridad-baja: #2ecc71;
+    --color-fondo: #f5f5f5;
+    --color-texto: #333333;
+
+    /*Fuentes*/
+    --fuente-principal: 'Arial', sans-serif;
+
+    /*Espaciados*/
+    --espacio-pequeno: 4px;
+    --espacio-medio: 8px; 
+    --espacio-grande: 16px; 
+}
+
+header h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: var(--color-texto);
+}
+
+.contenedor-principal {
+    display: flex;
+    flex-direction: row;
+}
+@media (max-width: 600px) {
+    .contenedor-principal {
+        flex-direction: column; /*aside y main uno debajo del otro*/
+    }
+    aside {
+        width: 100%;
+        margin-bottom: var(--espacio-medio);
+    }
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--color-fondo);
+}
+
+header {
+    width: 100%;
+    padding: var(--espacio-grande);
+    background-color: var(--color-fondo);
+    text-align: center;
+}
+
+
+aside {
+    width: 200px; /*tener tamaño constante de barra*/
+    padding: var(--espacio-medio); /* para no pegarlo al borde*/
+    background-color:plum; 
+}
+aside ul {
+    list-style: none; /*quita los puntos por defecto*/
+    padding: 0;
+    margin: 0;
+}
+
+aside ul li {
+    background-color: #ffffff;
+    padding: var(--espacio-pequeno) var(--espacio-medio);
+    margin-bottom: var(--espacio-pequeno); /*para separar cada categoria*/
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+ aside ul li {
+    background-color: #f0f0f0;
+    cursor: pointer;
+ }
+
+main {
+    flex: 1; /*automático dependiendo de espacio disponible*/
+
+}
+
+.tarea {
+    background-color:grey;
+    padding: var(--espacio-medio);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+}
+
+
+span.alta {
+    background-color: var(--color-prioridad-alta);
+    color: white;
+    padding: var(--espacio-pequeno) var(--espacio-medio);
+    font-weight: bold;
+}
+
+span.media {
+    background-color: var(--color-prioridad-media);
+    color: white;
+    padding: var(--espacio-pequeno) var(--espacio-medio);
+    font-weight: bold;
+}
+
+span.baja {
+    background-color: var(--color-prioridad-baja);
+    color: white;
+    padding: var(--espacio-pequeno) var(--espacio-medio);
+    font-weight: bold;
+}
+span.alta,
+span.media,
+span.baja {
+    transition: background-color 0.3s ease, color 0.3s ease; /*transicion suave*/
+}
+
+span.alta:hover { /*para que cambie de color cuando ponemos el cursor encima*/
+    background-color: #c0392b;
+}
+
+span.media:hover {
+    background-color: #d35400;
+}
+
+span.baja:hover {
+    background-color: #27ae60;
+}
+
+.tarea {
+    transition: background-color 0.3s ease;
+
+}
+.tarea:hover {
+    background-color: #f9f9f9; /*gris clarito*/
+}
