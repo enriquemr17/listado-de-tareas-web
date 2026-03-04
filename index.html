@@ -5,6 +5,7 @@
     <title>LISTADO DE TAREAS</title>
 </head>
 <link rel="stylesheet" href="estilos.css">
+<script src="app.js"></script>
 <body>
     <header>
         <h1>LISTADO DE TAREAS</h1>
@@ -48,6 +49,13 @@
                 <span class="prioridad baja">Baja</span>
             </div>
         </section>
+        
+        <form id="form-tarea"> 
+            <input type="text" id="input tarea" placeholder="Escribe una tarea nueva">
+            <button type="submit">Añadir</button>
+        </form>
+
+        <section id="lista-tareas"></section>
     </main>
     </div>
 </body>
