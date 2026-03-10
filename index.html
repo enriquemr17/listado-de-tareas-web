@@ -28,41 +28,116 @@
                 <li class="bg-white dark:bg-gray-700 p-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600">Personal</li>
             </ul>
     </aside>
+    <!--LISTADO DE TAERAS-->
 
-    <main class="flex-1 p-4 max-w-3x1 w-full">
-        <input type="text" id="input-buscar" placeholder="Buscar tarea...">
-        <p id="sin-coincidencias" style="display: none;">No hay tareas que coincidan</p>
+    <!-- BUSCAR UNA TAREA-->
+    <main class="flex-1 p-4 max-w-3xl w-full">
+        <form id="form-buscar" class="mt-4 flex-col md:flex-row gap-2">
+        <input 
+        type="text"
+        id="input-buscar"
+        placeholder="Buscar tarea..."
+        class="p-2 border rounded w-full mb-2
+        bg-white dark:bg-gray-700
+        text-gray-900 dark:text-white
+        focus:ring-2 focus:ring-blue-500 transition">
 
+        <select id="filtroCategoria" class="p-2 border rounded bg-white dark:bg-gray-700">
+                <option value="">Todas</option>
+                <option value="Profesional">Profesional</option>
+                <option value="Finanzas">Finanzas</option>
+                <option value="Salud">Salud</option>
+                <option value="Personal">Personal</option>
+             </select> 
+
+             <select id="filtroPrioridad" class="p-2 border rounded bg-white dark:bg-gray-700">
+                <option value="">Todas</option>
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+        </select>
+                    
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">Buscar</button>
+
+
+        <p id="sin-coincidencias" 
+        style="display: none;">No hay tareas que coincidan</p>
+       </form>
+
+       <!-- CREAR UNA NUEVA TAREA-->
         <form id="form-tarea" class="mt-4 flex-col md:flex-row gap-2"> 
-            <input type="text" class="p-2 border rounded w-full md:flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" id="input-tarea" placeholder="Escribe una tarea nueva">
+            <input 
+            type="text" 
+            class="p-2 border rounded w-full md:flex-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition" 
+            id="input-tarea" 
+            placeholder="Escribe una tarea nueva">
+
+            <select id="categoria" class="p-2 border rounded bg-white dark:bg-gray-700">
+                <option value="Profesional">Profesional</option>
+                <option value="Finanzas">Finanzas</option>
+                <option value="Salud">Salud</option>
+                <option value="Personal">Personal</option>
+             </select> <!--con esto le damos la opcion a añadir categorias y después la prioridad-->
+
+             <select id="prioridad" class="p-2 border rounded bg-white dark:bg-gray-700">
+                <option value="Alta">Alta</option>
+                <option value="Media">Media</option>
+                <option value="Baja">Baja</option>
+            </select>
+            
             <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">Añadir</button>
         </form>
 
         <section id= "lista-tareas" class="space-y-3"> 
-            <div class="tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow w-full">
-                <h3 class="text-gray-900 dark:text-white">Preparar propuesta para cliente</h3>
+            <div class="tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow">
+                <h3 class="text-gray-900 dark:text-white gap-1">Preparar propuesta para cliente</h3>
+                
+                <div class="flex items-center"> <!--para hacer que todas tengan el mismo espacio entre categorias, prioridades y texto-->
                 <span class="categoria">Profesional</span>
-                <span class="bg-red-500 text-white px-2 py-1 rounded font-bold">Alta</span>
+                <span class="prioridad bg-red-500 text-white px-2 py-1 rounded font-bold">Alta</span>
+                </div>
+                
+                <button class="bg-red-400 dark:bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 dark:hover:bg-red-700 transition">Eliminar</button>
             </div>
-            <div class="tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow w-full">
-                <h3>Revisar presupuestos mensual</h3>
+            <div class="tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow">
+                <h3 class="text-gray-900 dark:text-white">Revisar presupuesto mensual</h3>
+                
+                <div class="flex items-center gap-2">
                 <span class="categoria">Finanzas</span>
-                <span class="bg-yellow-500 text-white px-2 py-1 rounded font-bold">Media</span>
+                <span class="prioridad bg-yellow-500 text-white px-2 py-1 rounded font-bold">Media</span>
+                </div>
+                
+                <button class="bg-red-400 dark:bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 dark:hover:bg-red-700 transition">Eliminar</button>
             </div>
-            <div class="tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow w-full">
-                <h3>Programar revisión médica</h3>
+            <div class="tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow">
+                <h3 class="dark:text-white">Programar revisión médica</h3>
+                
+                <div class="flex items-center gap-2">
                 <span class="categoria">Salud</span>
-                <span class="bg-yellow-500 text-white px-2 py-1 rounded font-bold">Media</span>
+                <span class="prioridad bg-yellow-500 text-white px-2 py-1 rounded font-bold">Media</span>
+                </div>
+                
+                <button class="bg-red-400 dark:bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 dark:hover:bg-red-700 transition">Eliminar</button>
             </div>
-            <div class="tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow w-full">
-                <h3>Organizar documentos fiscales</h3>
+            <div class="tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow">
+                <h3 class="text-gray-900 dark:text-white">Organizar documentos fiscales</h3>
+                
+                <div class="flex items-center gap-2">
                 <span class="categoria">Finanzas</span>
-                <span class="bg-red-500 text-white px-2 py-1 rounded font-bold">Alta</span>
+                <span class="prioridad bg-red-500 text-white px-2 py-1 rounded font-bold">Alta</span>
+                </div>
+                
+                <button class="bg-red-400 dark:bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 dark:hover:bg-red-700 transition">Eliminar</button>
             </div>
-            <div class=" tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow w-full">
-                <h3>Planificar semana siguiente</h3>
+            <div class=" tarea flex justify-between items-center bg-gray-200 dark:bg-gray-800 p-4 rounded shadow">
+                <h3 class="text-gray-900 dark:text-white">Planificar semana siguiente</h3>
+                
+                <div class="flex items-center gap-2">
                 <span class="categoria">Personal</span>
-                <span class="bg-green-500 text-white px-2 py-1 rounded font-bold">Baja</span>
+                <span class="prioridad bg-green-500 text-white py-1 rounded font-bold">Baja</span>
+                </div>
+                
+                <button class="bg-red-400 dark:bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 dark:hover:bg-red-700 transition">Eliminar</button>
             </div>
         </section>
         

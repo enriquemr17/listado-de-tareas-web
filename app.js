@@ -1,26 +1,36 @@
 const formulario = document.getElementById ("form-tarea"); //constante 
+const formularioBuscar= document.getElementById("form-buscar"); 
 const input = document.getElementById("input-tarea"); 
 const lista = document.getElementById ("lista-tareas"); 
 const div = document.createElement ("div"); 
 const inputBuscar = document.getElementById("input-buscar"); 
-const sinCoincidencias = document.getElementById("sin-coincidencias"); 
+const sinCoincidencias = document.getElementById("sin-coincidencias");
+const selectCategoria = document.getElementById("categoria")
+const selectPrioridad = document.getElementById ("prioridad"); 
+const filtrarCategoria = document.getElementById("filtroCategoria"); 
+const filtrarPrioridad = document.getElementById("filtroPrioridad");
+ 
  
 
 formulario.addEventListener("submit", function(e) {
     e.preventDefault () //evita que la pagina se recargue
 
     const texto = input.value.trim(); //trim se utiliza para quitar espacios delante y detras del texto
-    if (texto!== "") {
-        crearTarea(texto); 
-        input.value = ""; //limpiar el input para escribir otra
-    }
+    const categoria = selectCategoria.value; 
+    const prioridad = selectPrioridad.value;
+   
+    crearTarea(texto, categoria, prioridad); 
+    input.value = ""; //limpiar el input para escribir otra
+    
    
 }); 
+// CREAR TAREA
 
-function crearTarea(texto) {
+function crearTarea(texto, categoria, prioridad) {
     const div = document.createElement ("div")
      div.classList.add(
         "tarea",
+        "nueva",
         "flex",
         "justify-between",
         "items-center",
@@ -37,6 +47,23 @@ function crearTarea(texto) {
     p.textContent = texto;
     p.classList.add("text-gray-900", "dark:text-white"); 
 
+    //CATEGORIA 
+    const categoriaSpan = document.createElement("span"); 
+    categoriaSpan.textContent = categoria; 
+    categoriaSpan.classList.add("categoria"); 
+
+
+    //PRIORIDAD
+    const prioridadSpan = document.createElement("span"); 
+    prioridadSpan.textContent = prioridad; 
+    prioridadSpan.classList.add("prioridad"); 
+
+    prioridadSpan.classList.add("text-white", "px-2", "py-1", "rounded", "font-bold"); 
+
+    if (prioridad === "Alta") prioridadSpan.classList.add ("bg-red-500"); 
+    if (prioridad === "Media") prioridadSpan.classList.add ("bg-yellow-500"); 
+    if (prioridad === "Baja") prioridadSpan.classList.add ("bg-green-500"); 
+        //BOTON DE ELIMINAR 
     const boton = document.createElement ("button"); 
     boton.textContent = "Eliminar";
     boton.classList.add (
@@ -58,6 +85,8 @@ function crearTarea(texto) {
 }); 
 
     div.appendChild(p); //pone p dentro de div
+    div.appendChild(categoriaSpan); 
+    div.appendChild(prioridadSpan); 
     div.appendChild(boton); 
     
 
@@ -68,44 +97,75 @@ function crearTarea(texto) {
 
 function guardarTareas () {
     const tareas = []; // se pone [] porque estamos creando un array pero al no haber nada dentro, esta vacío
-    document.querySelectorAll(".tarea p").forEach (function(parrafo){ //busca todo los p dentro de .tarea y metelos dentro del array
-        tareas.push (parrafo.textContent); // push para meter lo que este dentro de "p" en el array. Push se usa en arrays
+    document.querySelectorAll(".tarea.nueva").forEach (div => { //busca todo los p dentro de .tarea y metelos dentro del array
+        const texto = div.querySelector("p")?.textContent || div.querySelector("h3")?.textContent; 
+        const categoria = div.querySelector(".categoria")?.textContent; 
+        const prioridad = div.querySelector(".prioridad")?.textContent;
+        
+        if (!texto || !categoria|| !prioridad) return; 
+        tareas.push ({texto: texto, categoria: categoria, prioridad: prioridad}); // push para meter lo que este dentro de tarea en el array. Push se usa en arrays
     }); 
     localStorage.setItem("tareas", JSON.stringify(tareas)); 
-    div.classList.add("tarea");
+    
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const tareasGuardadas = JSON.parse(localStorage.getItem("tareas")); 
-    if (tareasGuardadas) {
-        tareasGuardadas.forEach(function(tarea){
-            crearTarea(tarea); 
+document.addEventListener("DOMContentLoaded", () => {
+    const tareasGuardadas = JSON.parse(localStorage.getItem("tareas")) || []; 
+    
+        tareasGuardadas.forEach(tarea =>{
+            if (!tarea.texto) return; 
+            crearTarea(tarea.texto, tarea.categoria, tarea.prioridad); 
+       
         }); 
-    }
-})
+    
+}); 
 
-inputBuscar.addEventListener("input", function() { //funciona mientras escribres
-    const texto = inputBuscar.value.toLowerCase(); //hacer todo minusculas
-    let coincidencias = 0; //creacion de variable de coincidencias
+    //AÑADIR BOTON DE ELIMINAR A TAREAS DE HTML 
+    document.querySelectorAll("#lista-tareas .tarea button").forEach(boton => {
+    boton.addEventListener("click", function() {
+        this.parentElement.remove();
+        guardarTareas();
+    });
 
-    document.querySelectorAll("#lista-tareas .tarea").forEach(function(div){ //busca todas las clases "tarea" dentro de lista de tareas
-        const tareaTexto = (div.querySelector("h3") || div.querySelector("p")).textContent.toLowerCase(); 
-        
-        if(tareaTexto.includes(texto)) {
-            div.style.display = "flex"; 
-            coincidencias++; //añadimos +1 coincidencias.
+});
+
+// BUSCAR TAREA 
+ function filtrarTareas() {
+    const texto = inputBuscar.value.toLowerCase();
+    const categoriaSeleccionada = filtrarCategoria.value;
+    const prioridadSeleccionada = filtrarPrioridad.value;
+
+    let coincidencias = 0;
+
+    document.querySelectorAll("#lista-tareas .tarea").forEach(div => {
+        const tareaTexto = (div.querySelector("h3") || div.querySelector("p")).textContent.toLowerCase();
+        const categoria = div.querySelector(".categoria").textContent;
+        const prioridad = div.querySelector(".prioridad").textContent;
+
+        const coincideTexto = texto === "" || tareaTexto.includes(texto);
+        const coincideCategoria = categoriaSeleccionada === "" || categoria === categoriaSeleccionada;
+        const coincidePrioridad = prioridadSeleccionada === "" || prioridad === prioridadSeleccionada;
+
+        if (coincideTexto && coincideCategoria && coincidePrioridad) {
+            div.style.display = "flex";
+            coincidencias++;
         } else {
-            div.style.display = "none"; 
+            div.style.display = "none";
         }
     });
 
-    if(coincidencias === 0) {
-        sinCoincidencias.style.display = "block"; //mostrar
-    } else {
-        sinCoincidencias.style.display = "none"; //ocultar
-    }
-}); 
+    sinCoincidencias.style.display = coincidencias === 0 ? "block" : "none";
+}
+inputBuscar.addEventListener("input", filtrarTareas);
+filtrarCategoria.addEventListener("change", filtrarTareas);
+filtrarPrioridad.addEventListener("change", filtrarTareas);
 
+
+
+
+/*BOTON MODO OSCURO*/
 document.getElementById("boton-dark").addEventListener("click", () => {
     document.documentElement.classList.toggle("dark"); 
-})
+}); 
+
+
