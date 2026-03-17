@@ -12,6 +12,13 @@ const filtrarPrioridad = document.getElementById("filtroPrioridad");
 const filtrarEstado = document.getElementById("filtroEstado");
 const botonCompletarTodas = document.getElementById("completar-todas"); 
 const botonEliminarCompletadas = document.getElementById("eliminar-completadas");
+
+const modalEditar = document.getElementById("modal-editar");
+const modalEditarTexto = document.getElementById("modal-editar-texto");
+const modalEditarPrioridad = document.getElementById("modal-editar-prioridad");
+const modalEditarGuardar = document.getElementById("modal-editar-guardar");
+const modalEditarCancelar = document.getElementById("modal-editar-cancelar");
+let tareaEditando = null;
  
  
 
@@ -32,20 +39,8 @@ formulario.addEventListener("submit", function(e) {
 // BOTÓN COMPLETAR TODAS
 botonCompletarTodas.addEventListener("click", () => {
     document.querySelectorAll("#lista-tareas .tarea").forEach(div => {
-        const listaCompletadas = document.getElementById("lista-completadas");
-        const p = div.querySelector("p") || div.querySelector("h3");
-
-        // Añadir tachado al texto
-        p.classList.add("line-through", "opacity-60");
-
-        // Mover a lista de completadas
+        marcarComoCompletada(div);
         listaCompletadas.appendChild(div);
-
-        // Quitar botones que no deberían aparecer en completadas
-        const botonCompletar = div.querySelector(".btn-completar");
-        const botonEditar = div.querySelector(".btn-editar");
-        if (botonCompletar) botonCompletar.remove();
-        if (botonEditar) botonEditar.remove();
     });
 
     guardarTareas(); // actualizar LocalStorage
@@ -70,6 +65,86 @@ function crearBoton (texto, clases, accion) {
     return boton; 
 }
 
+function getBotonesContainer(tareaDiv) {
+    return tareaDiv.querySelector(".tarea-botones");
+}
+
+function actualizarPrioridad(prioridadSpan, prioridad) {
+    prioridadSpan.textContent = prioridad;
+    prioridadSpan.classList.remove("bg-red-500", "bg-yellow-500", "bg-green-500");
+
+    if (prioridad === "Alta") prioridadSpan.classList.add("bg-red-500");
+    if (prioridad === "Media") prioridadSpan.classList.add("bg-yellow-500");
+    if (prioridad === "Baja") prioridadSpan.classList.add("bg-green-500");
+}
+
+function normalizarPrioridad(input) {
+    if (input == null) return null;
+    const v = String(input).trim().toLowerCase();
+    if (v === "alta") return "Alta";
+    if (v === "media") return "Media";
+    if (v === "baja") return "Baja";
+    return null;
+}
+
+function handlerEditarConPrioridad(div) {
+    const p = div.querySelector("p") || div.querySelector("h3");
+    const prioridadSpan = div.querySelector(".prioridad");
+    if (!p || !prioridadSpan) return;
+    if (!modalEditar || !modalEditarTexto || !modalEditarPrioridad) return;
+
+    tareaEditando = div;
+    modalEditarTexto.value = p.textContent || "";
+    modalEditarPrioridad.value = (prioridadSpan.textContent || "Media").trim();
+
+    if (typeof modalEditar.showModal === "function") modalEditar.showModal();
+    else modalEditar.setAttribute("open", "");
+
+    modalEditarTexto.focus();
+}
+
+function guardarEdicionModal() {
+    if (!tareaEditando) return;
+    const p = tareaEditando.querySelector("p") || tareaEditando.querySelector("h3");
+    const prioridadSpan = tareaEditando.querySelector(".prioridad");
+    if (!p || !prioridadSpan) return;
+
+    const nuevoTexto = (modalEditarTexto?.value || "").trim();
+    if (nuevoTexto === "") return;
+
+    const nuevaPrioridad = normalizarPrioridad(modalEditarPrioridad?.value);
+    if (!nuevaPrioridad) return;
+
+    p.textContent = nuevoTexto;
+    actualizarPrioridad(prioridadSpan, nuevaPrioridad);
+    guardarTareas();
+    filtrarTareas();
+
+    cerrarModalEditar();
+}
+
+function cerrarModalEditar() {
+    tareaEditando = null;
+    if (!modalEditar) return;
+
+    if (typeof modalEditar.close === "function") modalEditar.close();
+    else modalEditar.removeAttribute("open");
+}
+
+modalEditarGuardar?.addEventListener("click", (e) => {
+    e.preventDefault();
+    guardarEdicionModal();
+});
+
+modalEditarCancelar?.addEventListener("click", (e) => {
+    e.preventDefault();
+    cerrarModalEditar();
+});
+
+modalEditar?.addEventListener("close", () => {
+    tareaEditando = null;
+});
+
 function marcarComoPendiente(div) {
     const p = div.querySelector("p") || div.querySelector("h3");
     if (p) p.classList.remove("line-through", "opacity-60");
@@ -77,7 +152,8 @@ function marcarComoPendiente(div) {
     const botonPendiente = div.querySelector(".btn-pendiente");
     if (botonPendiente) botonPendiente.remove();
 
-    const botonEliminar = Array.from(div.querySelectorAll("button")).find(b => b.textContent === "Eliminar") || null;
+    const contBotones = getBotonesContainer(div) || div;
+    const botonEliminar = Array.from(contBotones.querySelectorAll("button")).find(b => b.textContent === "Eliminar") || null;
 
     if (!div.querySelector(".btn-editar") && p) {
         const botonEditar = crearBoton("Editar", [
@@ -88,16 +164,10 @@ function marcarComoPendiente(div) {
             "py-1",
             "rounded",
             "hover:bg-blue-600"
-        ], () => {
-            const nuevoTexto = prompt("Editar tarea:", p.textContent);
-            if (nuevoTexto && nuevoTexto.trim() !== "") {
-                p.textContent = nuevoTexto;
-                guardarTareas();
-            }
-        });
+        ], () => handlerEditarConPrioridad(div));
 
-        if (botonEliminar) div.insertBefore(botonEditar, botonEliminar);
-        else div.appendChild(botonEditar);
+        if (botonEliminar) contBotones.insertBefore(botonEditar, botonEliminar);
+        else contBotones.appendChild(botonEditar);
     }
 
     if (!div.querySelector(".btn-completar") && p) {
@@ -115,8 +185,8 @@ function marcarComoPendiente(div) {
             guardarTareas();
         });
 
-        if (botonEliminar) div.insertBefore(botonCompletar, botonEliminar);
-        else div.appendChild(botonCompletar);
+        if (botonEliminar) contBotones.insertBefore(botonCompletar, botonEliminar);
+        else contBotones.appendChild(botonCompletar);
     }
 }
 
@@ -130,6 +200,7 @@ function marcarComoCompletada(div) {
     if (botonEditar) botonEditar.remove();
 
     if (!div.querySelector(".btn-pendiente")) {
+        const contBotones = getBotonesContainer(div) || div;
         const botonPendiente = crearBoton("Pendiente", [
             "btn-pendiente",
             "bg-orange-500",
@@ -144,7 +215,7 @@ function marcarComoCompletada(div) {
             guardarTareas();
         });
 
-        div.appendChild(botonPendiente);
+        contBotones.appendChild(botonPendiente);
     }
 }
 
@@ -153,8 +224,11 @@ function crearTarea(texto, categoria, prioridad) {
     div.classList.add(
         "tarea",
         "flex",
-        "justify-between",
-        "items-center",
+        "flex-col",
+        "md:flex-row",
+        "items-stretch",
+        "md:items-center",
+        "gap-3",
         "bg-gray-200",      // fondo claro
         "dark:bg-gray-800",  // fondo oscuro
         "dark:text-white",
@@ -166,7 +240,7 @@ function crearTarea(texto, categoria, prioridad) {
         
     const p = document.createElement ("p") //p siginifca parrafo o texto normalmente
     p.textContent = texto;
-    p.classList.add("text-gray-900", "dark:text-white"); 
+    p.classList.add("text-gray-900", "dark:text-white", "clamp-3", "break-anywhere"); 
 
     //CATEGORIA 
     const categoriaSpan = document.createElement("span"); 
@@ -181,17 +255,42 @@ function crearTarea(texto, categoria, prioridad) {
 
     prioridadSpan.classList.add("text-white", "px-2", "py-1", "rounded", "font-bold"); 
 
-    if (prioridad === "Alta") prioridadSpan.classList.add ("bg-red-500"); 
-    if (prioridad === "Media") prioridadSpan.classList.add ("bg-yellow-500"); 
-    if (prioridad === "Baja") prioridadSpan.classList.add ("bg-green-500"); 
+    actualizarPrioridad(prioridadSpan, prioridad);
     
+    // Contenedor de botones (izquierda en desktop, arriba en móvil)
+    const botonesDiv = document.createElement("div");
+    botonesDiv.classList.add(
+        "tarea-botones",
+        "flex",
+        "flex-row",
+        "flex-wrap",
+        "gap-2",
+        "md:flex-col",
+        "md:flex-nowrap",
+        "md:items-stretch"
+    );
+
+    // Contenedor de contenido (texto + badges)
+    const contenidoDiv = document.createElement("div");
+    contenidoDiv.classList.add(
+        "flex",
+        "flex-col",
+        "gap-2",
+        "flex-1",
+        "min-w-0"
+    );
+
+    const badgesDiv = document.createElement("div");
+    badgesDiv.classList.add("flex", "flex-wrap", "gap-2", "items-center");
+
     //BOTON DE ELIMINAR 
     
     const botonEliminar = crearBoton ("Eliminar", [
         "bg-red-400",
         "dark:bg-red-600",
         "text-white",
-        "px-3",
+        "px-2",
+        "text-sm",
         "py-1",
         "rounded",
         "hover:bg-red-500"
@@ -208,18 +307,14 @@ function crearTarea(texto, categoria, prioridad) {
         "btn-editar",
         "bg-blue-500",
         "text-white",
-        "px-3",
+        "px-2",
+        "text-sm",
         "py-1",
         "rounded",
         "hover:bg-blue-600"
     ],
     function() {
-        const nuevoTexto = prompt("Editar tarea:", p.textContent); 
-
-        if (nuevoTexto && nuevoTexto.trim() !== "") {
-            p.textContent = nuevoTexto; 
-            guardarTareas(); 
-        }
+        handlerEditarConPrioridad(div);
     }
 ); 
 
@@ -229,7 +324,8 @@ function crearTarea(texto, categoria, prioridad) {
         "btn-completar",
         "bg-green-500",
         "text-white",
-        "px-3",
+        "px-2",
+        "text-sm",
         "py-1",
         "rounded",
         "hover:bg-green-600"
@@ -244,13 +340,21 @@ function crearTarea(texto, categoria, prioridad) {
 
     )
 
-    div.appendChild(p); //pone p dentro de div
-    div.appendChild(categoriaSpan); 
-    div.appendChild(prioridadSpan); 
+    // Estructura:
+    // [botones] [contenido(texto + badges)]
+    botonesDiv.appendChild(botonEditar);
+    botonesDiv.appendChild(botonCompletar);
+    botonesDiv.appendChild(botonEliminar);
+
+    badgesDiv.appendChild(categoriaSpan);
+    badgesDiv.appendChild(prioridadSpan);
+
+    contenidoDiv.appendChild(p);
+    contenidoDiv.appendChild(badgesDiv);
+
+    div.appendChild(contenidoDiv);
+    div.appendChild(botonesDiv);
     
-    div.appendChild(botonEditar); 
-    div.appendChild(botonCompletar); 
-    div.appendChild(botonEliminar); 
 
     lista.appendChild(div); // pone todo el div dentro de la seccion de tareas de la pagina
     return div; // RECIBE LA TAREA CREADA Y LA NUEVA

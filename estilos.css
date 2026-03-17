@@ -1,0 +1,23 @@
+/* Utilidad para "line clamp" sin plugin Tailwind */
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+/* Opcional: mejor corte de palabras en textos largos */
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Opcional: mejor corte de palabras en textos largos */
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+
+
