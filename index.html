@@ -1,151 +1,150 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>LISTADO DE TAREAS</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listado de Tareas</title>
+  <link rel="stylesheet" href="estilos.css">
+  <script src="app.js" defer></script>
 </head>
-<link rel="stylesheet" href="estilos.css">
-<link rel="stylesheet" href="output.css">
+<body>
 
-<script src="app.js" defer></script>
+  <!-- MODAL EDITAR -->
+  <dialog id="modal-editar" class="modal-dialogo">
+    <form method="dialog" class="modal-caja">
+      <p class="modal-h">Editar tarea</p>
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white font-sans ">
+      <label class="modal-label" for="modal-editar-texto">Descripción</label>
+      <input class="modal-input" id="modal-editar-texto" type="text" required />
 
-    <dialog id="modal-editar" class="rounded-lg p-0 w-[min(92vw,520px)] backdrop:bg-black/50">
-        <form method="dialog" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-5 rounded-lg">
-            <h2 id="modal-editar-titulo" class="text-xl font-bold mb-4">Editar tarea</h2>
+      <label class="modal-label" for="modal-editar-prioridad">Prioridad</label>
+      <select class="modal-select" id="modal-editar-prioridad">
+        <option value="Alta">Alta</option>
+        <option value="Media">Media</option>
+        <option value="Baja">Baja</option>
+      </select>
 
-            <div class="mb-4">
-                <label for="modal-editar-texto" class="block text-sm font-semibold mb-1">Texto</label>
-                <input id="modal-editar-texto" type="text"
-                    class="w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition"
-                    required />
-            </div>
+      <div class="modal-btns">
+        <button class="mbtn-cancel" id="modal-editar-cancelar" type="button">Cancelar</button>
+        <button class="mbtn-save"   id="modal-editar-guardar"  type="button">Guardar</button>
+      </div>
+    </form>
+  </dialog>
 
-            <div class="mb-5">
-                <label for="modal-editar-prioridad" class="block text-sm font-semibold mb-1">Prioridad</label>
-                <select id="modal-editar-prioridad"
-                    class="w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition">
-                    <option value="Alta">Alta</option>
-                    <option value="Media">Media</option>
-                    <option value="Baja">Baja</option>
-                </select>
-            </div>
-
-            <div class="flex justify-end gap-2">
-                <button id="modal-editar-cancelar" value="cancel"
-                    class="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded hover:bg-gray-400 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
-                    Cancelar
-                </button>
-                <button id="modal-editar-guardar" value="default"
-                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
-                    Guardar
-                </button>
-            </div>
-        </form>
-    </dialog>
-    
-    <button id="boton-dark" aria-label="Alternar modo oscuro" class="px-4 py-2 bg-gray-300 dark:bg-gray-700 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">ALTERNAR MODO OSCURO</button>
-    
-    <header class="bg-gray-100 dark:bg-gray-900 p-4 shadow mb-4">
-        <h1 class="text-3xl font-bold text-blue-600 dark:text-white text-center">
-            LISTADO DE TAREAS</h1>
-    </header>
-    <!--Contenedor principal-->
-    <div class="flex flex-col md:flex-row min-h-screen justify-center">
-        <aside class="w-52 md:w-64 lg:w-72 p-4 bg-purple-200 dark:bg-purple-800 rounded">
-            <h2  class="font-semibold mb-4">Categorias</h2>
-            <ul>
-                <li class="bg-white dark:bg-gray-700 p-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600">Profesional</li>
-                <li class="bg-white dark:bg-gray-700 p-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600">Finanzas</li>
-                <li class="bg-white dark:bg-gray-700 p-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600">Salud</li>
-                <li class="bg-white dark:bg-gray-700 p-2 rounded border border-gray-300 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600">Personal</li>
-            </ul>
-    </aside>
-    <!--LISTADO DE TAERAS-->
-
-    <!-- BUSCAR UNA TAREA-->
-    <main class="flex-1 p-6 max-w-6xl w-full mx-auto">
-        <form id="form-buscar" class="mt-4 flex-col md:flex-row gap-2" aria-label="Formulario de búsqueda y filtros">
-        <label for="input-buscar" class="sr-only">Buscar tarea</label>
-        <input 
-        type="text"
-        id="input-buscar"
-        placeholder="Buscar tarea..."
-        class="p-2 border rounded w-full mb-2
-        bg-white dark:bg-gray-700
-        text-gray-900 dark:text-white
-        focus:ring-2 focus:ring-blue-500 transition">
-
-        <label for="filtroCategoria" class="sr-only">Filtrar por categoría</label>
-        <select id="filtroCategoria" class="p-2 border rounded bg-white dark:bg-gray-700">
-                <option value="">Todas</option>
-                <option value="Profesional">Profesional</option>
-                <option value="Finanzas">Finanzas</option>
-                <option value="Salud">Salud</option>
-                <option value="Personal">Personal</option>
-             </select> 
-
-             <label for="filtroPrioridad" class="sr-only">Filtrar por prioridad</label>
-             <select id="filtroPrioridad" class="p-2 border rounded bg-white dark:bg-gray-700">
-                <option value="">Todas</option>
-                <option value="Alta">Alta</option>
-                <option value="Media">Media</option>
-                <option value="Baja">Baja</option>
-        </select>
-
-        <label for="filtroEstado" class="sr-only">Filtrar por estado</label>
-        <select id="filtroEstado" class="p-2 border rounded bg-white dark:bg-gray-700">
-                <option value="">Todas</option>
-                <option value="pendiente">Pendientes</option>
-                <option value="completada">Completadas</option>
-        </select>
-                    
-        <button type="submit" aria-label="Buscar tareas" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">Buscar</button>
-
-
-        <p id="sin-coincidencias" role="status" aria-live="polite"
-        style="display: none;">No hay tareas que coincidan</p>
-       </form>
-
-    <!-- CREAR UNA NUEVA TAREA-->
-        <form id="form-tarea" class="mt-4 flex-col md:flex-row gap-2" aria-label="Formulario para añadir tareas"> 
-            <label for="input-tarea" class="sr-only">Descripción de la tarea</label>
-            <input 
-            type="text" 
-            class="p-2 border rounded w-full md:flex-1 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition" 
-            id="input-tarea" 
-            placeholder="Escribe una tarea nueva">
-
-            <label for="categoria" class="sr-only">Categoría</label>
-            <select id="categoria" class="p-2 border rounded bg-white dark:bg-gray-700">
-                <option value="Profesional">Profesional</option>
-                <option value="Finanzas">Finanzas</option>
-                <option value="Salud">Salud</option>
-                <option value="Personal">Personal</option>
-             </select> <!--con esto le damos la opcion a añadir categorias y después la prioridad-->
-
-             <label for="prioridad" class="sr-only">Prioridad</label>
-             <select id="prioridad" class="p-2 border rounded bg-white dark:bg-gray-700">
-                <option value="Alta">Alta</option>
-                <option value="Media">Media</option>
-                <option value="Baja">Baja</option>
-            </select>
-            
-            <button type="submit" aria-label="Añadir tarea" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">Añadir</button>
-        </form>
-
-    <!--LISTADO DE TAREAS-->
-        <h2 class="text-xl font-bold mt-6">TAREAS</h2>
-        <section id= "lista-tareas" class="space-y-3"></section>
-        <button id="completar-todas" aria-label="Completar todas las tareas" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition mt-2">Completar todas las tareas</button>
-    
-    <!--TAREAS COMPLETADAS-->
-        <h2 class="text-xl font-bold mt-8 border-t pt-4">TAREAS COMPLETADAS</h2>
-        <section id="lista-completadas" class="space-y-3"></section>
-        <button id="eliminar-completadas" aria-label="Eliminar todas las tareas completadas" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition mt-2">Eliminar todas las completadas</button>
-    
-    </main>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="boton-menu" aria-label="Abrir menú de categorías">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="brand">Mis <span>Tareas</span></span>
     </div>
+    <div class="topbar-right">
+      <button class="dark-btn" id="boton-dark" aria-label="Alternar modo oscuro">☾ Modo oscuro</button>
+    </div>
+  </header>
+
+  <!-- OVERLAY SIDEBAR (móvil) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- WRAPPER -->
+  <div class="page-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <p class="sidebar-title">Categorías</p>
+      <ul>
+        <li class="cat-item"><span class="cat-dot" style="background:#6A8FAD"></span>Profesional</li>
+        <li class="cat-item"><span class="cat-dot" style="background:#A08050"></span>Finanzas</li>
+        <li class="cat-item"><span class="cat-dot" style="background:#5A9478"></span>Salud</li>
+        <li class="cat-item"><span class="cat-dot" style="background:#8A6AAD"></span>Personal</li>
+      </ul>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- BUSCAR Y FILTRAR -->
+      <form id="form-buscar" class="bloque" aria-label="Formulario de búsqueda y filtros">
+        <div class="search-row">
+          <label for="input-buscar" class="sr-only">Buscar tarea</label>
+          <input type="text" id="input-buscar" placeholder="Buscar tarea..." />
+          <button type="submit" class="btn-accion-principal">Buscar</button>
+        </div>
+        <div class="filters-row">
+          <label for="filtroCategoria" class="sr-only">Filtrar por categoría</label>
+          <select id="filtroCategoria">
+            <option value="">Todas las categorías</option>
+            <option value="Profesional">Profesional</option>
+            <option value="Finanzas">Finanzas</option>
+            <option value="Salud">Salud</option>
+            <option value="Personal">Personal</option>
+          </select>
+
+          <label for="filtroPrioridad" class="sr-only">Filtrar por prioridad</label>
+          <select id="filtroPrioridad">
+            <option value="">Todas las prioridades</option>
+            <option value="Alta">Alta</option>
+            <option value="Media">Media</option>
+            <option value="Baja">Baja</option>
+          </select>
+
+          <label for="filtroEstado" class="sr-only">Filtrar por estado</label>
+          <select id="filtroEstado">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="completada">Completadas</option>
+          </select>
+        </div>
+        <p id="sin-coincidencias" class="no-coin" role="status" aria-live="polite" style="display:none;">
+          Sin resultados para esa búsqueda.
+        </p>
+      </form>
+
+      <!-- AÑADIR TAREA -->
+      <form id="form-tarea" class="bloque" aria-label="Formulario para añadir tareas">
+        <p class="bloque-titulo">Nueva tarea</p>
+        <div class="add-row">
+          <label for="input-tarea" class="sr-only">Descripción de la tarea</label>
+          <input type="text" id="input-tarea" placeholder="Escribe la descripción..." />
+
+          <label for="categoria" class="sr-only">Categoría</label>
+          <select id="categoria">
+            <option value="Profesional">Profesional</option>
+            <option value="Finanzas">Finanzas</option>
+            <option value="Salud">Salud</option>
+            <option value="Personal">Personal</option>
+          </select>
+
+          <label for="prioridad" class="sr-only">Prioridad</label>
+          <select id="prioridad">
+            <option value="Alta">Alta</option>
+            <option value="Media">Media</option>
+            <option value="Baja">Baja</option>
+          </select>
+
+          <button type="submit" class="btn-accion-principal" aria-label="Añadir tarea">Añadir</button>
+        </div>
+      </form>
+
+      <!-- PENDIENTES -->
+      <div class="section-head">
+        <h2 class="section-title">Pendientes <span class="section-count" id="cnt-pendientes">0</span></h2>
+        <button id="completar-todas" class="btn-seccion-verde" aria-label="Completar todas las tareas">Completar todas</button>
+      </div>
+      <section id="lista-tareas" aria-label="Lista de tareas pendientes"></section>
+
+      <!-- COMPLETADAS -->
+      <div class="sep">
+        <div class="section-head">
+          <h2 class="section-title">Completadas <span class="section-count" id="cnt-completadas">0</span></h2>
+          <button id="eliminar-completadas" class="btn-seccion-rojo" aria-label="Eliminar todas las tareas completadas">Eliminar todas</button>
+        </div>
+        <section id="lista-completadas" aria-label="Lista de tareas completadas"></section>
+      </div>
+
+    </main>
+  </div>
+
 </body>
 </html>

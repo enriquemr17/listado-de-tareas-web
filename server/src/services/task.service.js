@@ -9,14 +9,14 @@ function obtenerTodas () {
 function crearTarea(data) { // creación de objeto (tarea) con datos
     const nueva = {
         id: Date.now().toString(),
-        texto: data.texto // lo que viene del fronted (texto del usuario)
+        texto // lo que viene del fronted (texto del usuario)
     }; 
     tasks.push(nueva);  // guardar tarea en la BD simulada
     return nueva; // para poder enviarlo al fronted.
 }
 
 function eliminarTarea(id) { // eliminar tareas a base de strings (ID)
-    const index = tasks.findIndex(t => t.id === id); // busca la posicion del ID en el array (BD)
+    const index = tasks.findIndex(t => t.id.toString() === id); // busca la posicion del ID en el array (BD)
 
     if (index === -1) { // si el valor del indice es -1 notificar con mensaje de error. 
         throw new Error ('NOT_FOUND'); 

@@ -15,11 +15,11 @@ app.use ('/api/v1/tasks', taskRoutes); // montaje de rutas (API V1= version1)
 // MIDDLEWARE DE ERRORES (evita que el servidor se caiga)
 
 app.use ((err, req, res, next) => {
-  if (err.message === 'NOT-FOUND') {
-    return res.status(404).json({error: 'No encontrado'}); 
+  if (err.message === 'NOT_FOUND') {
+    return res.status(404).json({error: 'No encontrado'})
   }
 
-  console.error (err); 
+  console.error(err); 
   res.status(500).json({error: 'Error interno del servidor'}); 
 }); 
 
