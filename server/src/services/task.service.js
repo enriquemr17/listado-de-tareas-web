@@ -9,7 +9,7 @@ function obtenerTodas () {
 function crearTarea(data) { // creación de objeto (tarea) con datos
     const nueva = {
         id: Date.now().toString(),
-        texto // lo que viene del fronted (texto del usuario)
+        texto: data.texto // lo que viene del fronted (texto del usuario)
     }; 
     tasks.push(nueva);  // guardar tarea en la BD simulada
     return nueva; // para poder enviarlo al fronted.
