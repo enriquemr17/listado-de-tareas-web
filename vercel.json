@@ -1,16 +1,17 @@
 {
-    "version": 2, 
-    "builds": [
-        {
-            "src": "index.js",
-            "use": "@vercel/node"
-        }
-    ],
-
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "index.js"
-        }
-    ]
+  "version": 2,
+  "builds": [
+    { "src": "server/src/index.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "app.js", "use": "@vercel/static" },
+    { "src": "estilos.css", "use": "@vercel/static" },
+    { "src": "output.css", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/v1/tasks(.*)", "dest": "server/src/index.js" },
+    { "src": "/app.js", "dest": "/app.js" },
+    { "src": "/estilos.css", "dest": "/estilos.css" },
+    { "src": "/output.css", "dest": "/output.css" },
+    { "src": "/", "dest": "/index.html" }
+  ]
 }
