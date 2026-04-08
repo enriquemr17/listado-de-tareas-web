@@ -20,6 +20,49 @@ const botonEliminarCompletadas = document.getElementById("eliminar-completadas")
 const cntPendientes          = document.getElementById("cnt-pendientes");
 const cntCompletadas         = document.getElementById("cnt-completadas");
 
+
+// ─── FUNCIONES API (BACKEND) ───
+
+async function getTasks() {
+  const response = await fetch(`${BASE_URL}`);
+  if (!response.ok) throw new Error("Error al obtener tareas");
+  return response.json();
+}
+
+async function createTask(texto, categoria, prioridad) {
+  const response = await fetch(`${BASE_URL}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ texto, categoria, prioridad })
+  });
+
+  if (!response.ok) throw new Error("Error al crear tarea");
+  return response.json();
+}
+
+async function deleteTask(id) {
+  const response = await fetch(`${BASE_URL}/${id}`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) throw new Error("Error al eliminar tarea");
+}
+
+async function updateTask(id, datos) {
+  const response = await fetch(`${BASE_URL}/tasks/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(datos)
+  });
+
+  if (!response.ok) throw new Error("Error al actualizar tarea");
+  return response.json();
+}
+
 // Modal
 const modalEditar            = document.getElementById("modal-editar");
 const modalEditarTexto       = document.getElementById("modal-editar-texto");
@@ -80,7 +123,6 @@ function guardarTareas() {
     if (!texto || !categoria || !prioridad) return;
     tareas.push({ texto, categoria, prioridad, completada });
   });
-  localStorage.setItem("tareas", JSON.stringify(tareas));
   actualizarContadores();
 }
 
@@ -208,9 +250,10 @@ function marcarComoPendiente(div) {
 }
 
 // ─── CREAR TAREA ───
-function crearTarea(texto, categoria, prioridad) {
+function crearTarea(texto, categoria, prioridad, id = null) { // nul siginifica opcional
   const div = document.createElement("div");
   div.classList.add("tarea");
+  div.dataset.id = id; //guardar el id en el div para usarlo con delete y patch
 
   // Texto
   const p = document.createElement("p");
@@ -250,10 +293,16 @@ function crearTarea(texto, categoria, prioridad) {
     listaCompletadas.appendChild(div);
     guardarTareas();
   });
-  const botonEliminar  = crearBoton("Eliminar",  ["btn-eliminar"],  () => {
-    div.remove();
-    guardarTareas();
-  });
+  const botonEliminar  = crearBoton("Eliminar",  ["btn-eliminar"], async () => {
+    try {
+      await deleteTask(div.dataset.id); 
+      div.remove(); 
+      actualizarContadores(); 
+    } catch (error) {
+      console.error ('Error al eliminar tarea', error); 
+    } 
+  }); 
+  
 
   botonesDiv.appendChild(botonEditar);
   botonesDiv.appendChild(botonCompletar);
@@ -267,13 +316,22 @@ function crearTarea(texto, categoria, prioridad) {
 }
 
 // ─── FORMULARIO AÑADIR ───
-formulario?.addEventListener("submit", (e) => {
+formulario?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const texto = input.value.trim();
+  const categoria = selectCategoria.value; 
+  const prioridad = selectPrioridad.value; 
   if (!texto) return;
-  crearTarea(texto, selectCategoria.value, selectPrioridad.value);
-  guardarTareas();
-  input.value = "";
+
+  try{
+    const tareaCreada = await createTask (texto, selectCategoria.value, selectPrioridad.value); 
+    crearTarea(tareaCreada.texto, tareaCreada.categoria, tareaCreada.prioridad, tareaCreada.id); 
+    actualizarContadores(); 
+    input.value = ""
+
+  } catch (error) {
+    console.error ('Error al crear tarea', error); 
+  }
 });
 
 // ─── COMPLETAR TODAS ───
@@ -338,15 +396,15 @@ formularioBuscar?.addEventListener("submit", (e) => {
 });
 
 // ─── CARGAR DESDE LOCALSTORAGE ───
-document.addEventListener("DOMContentLoaded", () => {
-  const tareasGuardadas = JSON.parse(localStorage.getItem("tareas")) || [];
-  tareasGuardadas.forEach(tarea => {
-    if (!tarea.texto) return;
-    const nuevaTarea = crearTarea(tarea.texto, tarea.categoria, tarea.prioridad);
-    if (tarea.completada) {
-      marcarComoCompletada(nuevaTarea);
-      listaCompletadas.appendChild(nuevaTarea);
-    }
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const tareas = await getTasks(); 
+    tareas.forEach(tarea => {
+      crearTarea(tarea.texto, tarea.categoria || 'Personal', tarea.prioridad || 'Media'); 
+  }); 
+  actualizarContadores(); 
+  } catch(error) {
+    console.error ('Error al cargar las tareas', error); 
+  }
   });
-  actualizarContadores();
-});
+  

@@ -8,12 +8,12 @@ function getTasks (req, res) { // llama al servicio para recuperar todas las tar
 }
 
 function createTask (req, res)  {
-    const { texto } = req.body; // extrae texto del cuerpo (body)
+    const { texto, categoria, prioridad } = req.body; // extrae texto del cuerpo (body)
 
     if (!texto) { // validacion que haya texto 
         return res.status(400).json({error: 'Texto requerido'}); // mensaje (400) si no hay texto 
     }
-    const nueva = service.crearTarea ({ texto }); // llamar al servicio para crear tarea
+    const nueva = service.crearTarea ({ texto, categoria, prioridad }); // llamar al servicio para crear tarea
     res.status(201).json(nueva); // devuelve tarea creada con codigo 201 formato JSON
 
 }
@@ -27,8 +27,18 @@ function deleteTask (req, res, next) {
     }
 }
 
+function updateTask(req, res, next) {
+    try {
+        const tarea = service.actualizarTarea(req.params.id, req.body); 
+        res.json(tarea); 
+    } catch (err) {
+        next(err); 
+    }
+}
+
 module.exports = {
     getTasks, 
     createTask,
-    deleteTask
+    deleteTask,
+    updateTask
 }; 
