@@ -3,6 +3,7 @@
 ===================================================== */
 
 // ─── REFERENCIAS DOM ───
+const botonDark = document.getElementById("boton-dark");
 const formulario             = document.getElementById("form-tarea");
 const formularioBuscar       = document.getElementById("form-buscar");
 const input                  = document.getElementById("input-tarea");
@@ -24,13 +25,13 @@ const cntCompletadas         = document.getElementById("cnt-completadas");
 // ─── FUNCIONES API (BACKEND) ───
 
 async function getTasks() {
-  const response = await fetch(`${BASE_URL}`);
+  const response = await fetch(`${BASE_URL}/tasks`);
   if (!response.ok) throw new Error("Error al obtener tareas");
   return response.json();
 }
 
 async function createTask(texto, categoria, prioridad) {
-  const response = await fetch(`${BASE_URL}`, {
+  const response = await fetch(`${BASE_URL}/tasks`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -43,7 +44,7 @@ async function createTask(texto, categoria, prioridad) {
 }
 
 async function deleteTask(id) {
-  const response = await fetch(`${BASE_URL}/${id}`, {
+  const response = await fetch(`${BASE_URL}/tasks/${id}`, {
     method: "DELETE"
   });
 
@@ -77,7 +78,7 @@ const sidebarOverlay = document.getElementById("sidebar-overlay");
 const botonMenu      = document.getElementById("boton-menu");
 
 // ─── MODO OSCURO ───
-const botonDark = document.getElementById("boton-dark");
+
 
 function aplicarModoOscuroGuardado() {
   const on = localStorage.getItem("modoOscuro") === "true";
@@ -318,6 +319,7 @@ function crearTarea(texto, categoria, prioridad, id = null) { // nul siginifica 
 // ─── FORMULARIO AÑADIR ───
 formulario?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  console.log("submit funciona"); 
   const texto = input.value.trim();
   const categoria = selectCategoria.value; 
   const prioridad = selectPrioridad.value; 
@@ -325,6 +327,7 @@ formulario?.addEventListener("submit", async (e) => {
 
   try{
     const tareaCreada = await createTask (texto, selectCategoria.value, selectPrioridad.value); 
+    console.log("respuesta backend:", tareaCreada); 
     crearTarea(tareaCreada.texto, tareaCreada.categoria, tareaCreada.prioridad, tareaCreada.id); 
     actualizarContadores(); 
     input.value = ""

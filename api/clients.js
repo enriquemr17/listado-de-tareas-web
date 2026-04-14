@@ -9,7 +9,7 @@ async function createTask(texto, categoria, prioridad) {
   const response = await fetch(`${BASE_URL}/tasks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ texto })
+    body: JSON.stringify({ texto, categoria, prioridad })
   });
   if (!response.ok) throw new Error('Error al crear tarea');
   return response.json();

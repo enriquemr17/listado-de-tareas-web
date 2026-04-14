@@ -3,20 +3,20 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 
-// Servir frontend desde la carpeta public
-app.use(express.static(path.join(__dirname, '../../public')));
+const app = express(); // ✅ PRIMERO crear app
 
-const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ✅ Servir frontend desde la carpeta public (DESPUÉS de crear app)
+app.use(express.static(path.join(__dirname, '../../')));
 
 const taskRoutes = require('./routes/task.routes');
 app.use('/api/v1/tasks', taskRoutes);
 
-app.get('/', (req, res) => {
-  res.json({ status: 'ok' });
-});
 
+
+// Middleware de errores
 app.use((err, req, res, next) => {
   if (err.message === 'NOT_FOUND') {
     return res.status(404).json({ error: 'No encontrado' });
@@ -25,12 +25,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  const { PORT } = require('./config/env');
-  app.listen(PORT, () => {
-    console.log(`Servidor en http://localhost:${PORT}`);
-  });
-}
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});
 
 module.exports = app;
 
